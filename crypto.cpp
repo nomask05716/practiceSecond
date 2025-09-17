@@ -1,5 +1,6 @@
 #include <iostream>
 #include <random>
+#include <limits>
 #include <string>
 #include "math.h"
 #include "crypto.h"
@@ -40,7 +41,7 @@ void shamirProtocol() {
     cout << "Ключи Боба: Cb = " << Cb << ", Db = " << Db << endl;
     string message;
     cout << "\nВведите сообщение для шифрования: ";
-    cin.ignore();
+    
     getline(cin, message);
     vector<int> encrypted;
     cout << "\nПроцесс шифрования:" << endl;
@@ -88,7 +89,7 @@ void mitmAttack() {
     
     string message;
     cout << "\nВведите сообщение для шифрования: ";
-    cin.ignore();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     getline(cin, message);
     
     cout << "\n=== ЭМУЛЯЦИЯ АТАКИ MitM ===" << endl;

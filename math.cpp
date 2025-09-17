@@ -26,15 +26,15 @@ int powMod(int a,int b,int m){
     int result =1;
     a = a %m;
     while (b>0){
-        cout << "Степень = "<<b<<endl;
+        //cout << "Степень = "<<b<<endl;
         if (b % 2 ==1){
             result = (a *result)%m; 
         }
         
         a = (a*a)%m;
-        cout << "a = "<<a<<endl;
+        //cout << "a = "<<a<<endl;
         b /= 2;
-        cout << "Промежуточный результат = "<<result<<endl;
+        //cout << "Промежуточный результат = "<<result<<endl;
 
         
     }
@@ -67,14 +67,14 @@ int extendedGcd(int a, int b, int &u, int &v) {
         return a;
     }
     int u1, v1;
-     cout <<"extendedGcd(" << b << ", " << a % b << ")" << endl;
+    //cout <<"extendedGcd(" << b << ", " << a % b << ")" << endl;
     int gcd = extendedGcd(b, a % b, u1, v1);
-    cout <<"u1 = " << u1 << ", v1 = " << v1 << endl;
+    //cout <<"u1 = " << u1 << ", v1 = " << v1 << endl;
     u = v1;
     v = u1 - (a / b) * v1;
-    cout <<"Вычисляем новые коэффициенты:" << endl;
-    cout <<"u = v1 = " << v1 << endl;
-    cout <<"v = u1 - (a/b)*v1 = " << u1 << " -(" << a << "/" << b << ")* " << v1 << " = " << u1 << " - " << (a/b) << "*" << v1 << " = " << v << endl;;
+    //cout <<"Вычисляем новые коэффициенты:" << endl;
+    //cout <<"u = v1 = " << v1 << endl;
+    //cout <<"v = u1 - (a/b)*v1 = " << u1 << " -(" << a << "/" << b << ")* " << v1 << " = " << u1 << " - " << (a/b) << "*" << v1 << " = " << v << endl;;
     return gcd;
 }
 int searchReciprocalNum(int c, int m) {
