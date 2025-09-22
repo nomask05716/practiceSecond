@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 using namespace std;
-void shamirProtocol();
+void shamirProtocol(string& inNameFile, int choice);
 void mitmAttack();

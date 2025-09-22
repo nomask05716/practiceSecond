@@ -42,7 +42,11 @@ int main(){
                 break;
             }
             case cryptoProtocol:{
-                shamirProtocol();
+                string pathFile =validInputPathFile();
+                int action;
+                cout << "Выберите действие: \n1 - Шифрование \n2 - Дешифрование \nВаш выбор:"<<endl;
+                cin >> action;
+                shamirProtocol(pathFile,action);
                 break;
             }
             case chainSht:{

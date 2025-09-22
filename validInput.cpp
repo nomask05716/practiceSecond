@@ -115,3 +115,26 @@ int modul()
         }
     }
 }
+string validInputPathFile()
+{
+    while (true)
+    {
+        try
+        {
+            cout << "Введите полный путь до файла(если в одной директории,то достаточно названия файла) >>";
+            string input;
+            getline(cin, input);
+            for (auto symbol : input){
+                if (symbol == '/'){
+                    throw runtime_error("Ошибка. В пути не должно содержаться '/'");
+                } 
+            }
+            return input;
+            
+        }
+        catch (const runtime_error &e)
+        {
+            cout << e.what() << endl;
+        }
+    }
+}
