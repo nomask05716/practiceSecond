@@ -48,15 +48,11 @@ func main() {
 			fmt.Println("d = ", d)
 		case cryptoProtocol:
 			pathFile := validInputPathFile()
-			var action int
-			fmt.Println("Выберите действие: \n1 - Шифрование \n2 - Дешифрование \nВаш выбор:")
-			_, _ = fmt.Scanln(&action)
-			shamirProtocol(&pathFile, action)
+			shamirProtocol(pathFile)
 		case chainSht:
 			a := exp()
 			b := exp()
 			res := chainShotes(a, b)
-			// print slice in format [x, y, z]
 			fmt.Print(" [")
 			for i, val := range res {
 				if i < len(res)-1 {

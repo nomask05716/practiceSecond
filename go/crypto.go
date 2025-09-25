@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"encoding/binary"
 	"fmt"
-	"io"
 	"math/rand"
 	"os"
 	"strings"
@@ -37,105 +36,94 @@ func generateSecretKey(p int) int {
 	return key
 }
 
-func shamirProtocol(inNameFile *string, choice int) {
-	var text, outNameFile string
-	if choice == 1 {
-		infile, err := os.Open(*inNameFile)
-		if err != nil {
-			return
-		}
-		defer infile.Close()
-		reader := bufio.NewReader(infile)
-		var sb strings.Builder
-		for {
-			b, err := reader.ReadByte()
-			if err != nil {
-				if err == io.EOF {
-					break
-				}
-				return
-			}
-			sb.WriteByte(b)
-		}
-		text = sb.String()
-
-		p := generatePrime(1000, 10000)
-		fmt.Println("Простое число p =", p)
-		Ca := generateSecretKey(p)
-		Da := searchReciprocalNum(Ca, p-1)
-		fmt.Println("Ключи Алисы: Ca =", Ca, ", Da =", Da)
-		Cb := generateSecretKey(p)
-		Db := searchReciprocalNum(Cb, p-1)
-		fmt.Println("Ключи Боба: Cb =", Cb, ", Db =", Db)
-
-		var encrypted []int32
-		for _, c := range text {
-			m := int(c)
-			x1 := powMod(m, Ca, p)
-			x2 := powMod(x1, Cb, p)
-			x3 := powMod(x2, Da, p)
-			encrypted = append(encrypted, int32(x3))
-		}
-
-		fmt.Print("Введите имя файла для сохранения: ")
-		fmt.Fscanln(os.Stdin, &outNameFile)
-
-		outfile, err := os.Create(outNameFile)
-		if err != nil {
-			return
-		}
-		defer outfile.Close()
-		for _, num := range encrypted {
-			_ = binary.Write(outfile, binary.LittleEndian, num)
-		}
-
-	} else if choice == 2 {
-		infile, err := os.Open(*inNameFile)
-		if err != nil {
-			return
-		}
-		defer infile.Close()
-
-		var p, Ca, Da, Cb, Db int
-		fmt.Print("Введите простое число p: ")
-		fmt.Fscanln(os.Stdin, &p)
-		fmt.Print("Введите секретный ключ Алисы Ca: ")
-		fmt.Fscanln(os.Stdin, &Ca)
-		fmt.Print("Введите обратный ключ Алисы Da: ")
-		fmt.Fscanln(os.Stdin, &Da)
-		fmt.Print("Введите секретный ключ Боба Cb: ")
-		fmt.Fscanln(os.Stdin, &Cb)
-		fmt.Print("Введите обратный ключ Боба Db: ")
-		fmt.Fscanln(os.Stdin, &Db)
-
-		var encrypted []int32
-		for {
-			var num int32
-			if err := binary.Read(infile, binary.LittleEndian, &num); err != nil {
-				if err == io.EOF {
-					break
-				}
-				return
-			}
-			encrypted = append(encrypted, num)
-		}
-
-		var decrypted strings.Builder
-		for _, x := range encrypted {
-			m := powMod(int(x), Db, p)
-			decrypted.WriteRune(rune(m))
-		}
-
-		fmt.Print("Введите имя файла для сохранения: ")
-		fmt.Fscanln(os.Stdin, &outNameFile)
-
-		outfile, err := os.Create(outNameFile)
-		if err != nil {
-			return
-		}
-		defer outfile.Close()
-		_, _ = outfile.WriteString(decrypted.String())
+func shamirProtocol(inNameFile string) {
+	infile, err := os.Open(inNameFile)
+	if err != nil {
+		fmt.Println("Ошибка открытия файла!")
+		return
 	}
+	defer infile.Close()
+
+	var sb strings.Builder
+	reader := bufio.NewReader(infile)
+	for {
+		b, err := reader.ReadByte()
+		if err != nil {
+			break
+		}
+		sb.WriteByte(b)
+	}
+	text := sb.String()
+
+	p := generatePrime(1000, 10000)
+	fmt.Println("Простое число p =", p)
+
+	Ca := generateSecretKey(p)
+	Da := searchReciprocalNum(Ca, p-1)
+	fmt.Println("Ключи Алисы: Ca =", Ca, ", Da =", Da)
+
+	Cb := generateSecretKey(p)
+	Db := searchReciprocalNum(Cb, p-1)
+	fmt.Println("Ключи Боба: Cb =", Cb, ", Db =", Db)
+
+	var x1Values, x2Values, x3Values, x4Values []int
+
+	fmt.Println("\nШаг 1: Алиса вычисляет x1 = m^Ca mod p")
+	for _, c := range text {
+		m := int(c)
+		x1 := powMod(m, Ca, p)
+		x1Values = append(x1Values, x1)
+	}
+	fmt.Print("Введите имя файла для сохранения x1: ")
+	var x1NameFile string
+	fmt.Scanln(&x1NameFile)
+	saveToFileInt(x1NameFile, x1Values)
+	fmt.Println("Промежуточный результат x1 сохранен в файл:", x1NameFile)
+
+	fmt.Println("Шаг 2: Боб вычисляет x2 = x1^Cb mod p")
+	for _, x1 := range x1Values {
+		x2 := powMod(x1, Cb, p)
+		x2Values = append(x2Values, x2)
+	}
+	fmt.Print("Введите имя файла для сохранения x2: ")
+	var x2NameFile string
+	fmt.Scanln(&x2NameFile)
+	saveToFileInt(x2NameFile, x2Values)
+	fmt.Println("Промежуточный результат x2 сохранен в файл:", x2NameFile)
+
+	fmt.Println("Шаг 3: Алиса вычисляет x3 = x2^Da mod p")
+	for _, x2 := range x2Values {
+		x3 := powMod(x2, Da, p)
+		x3Values = append(x3Values, x3)
+	}
+	fmt.Print("Введите имя файла для сохранения x3: ")
+	var x3NameFile string
+	fmt.Scanln(&x3NameFile)
+	saveToFileInt(x3NameFile, x3Values)
+	fmt.Println("Промежуточный результат x3 сохранен в файл:", x3NameFile)
+
+	fmt.Println("Шаг 4: Боб вычисляет x4 = x3^Db mod p")
+	var decryptedText strings.Builder
+	for _, x3 := range x3Values {
+		x4 := powMod(x3, Db, p)
+		x4Values = append(x4Values, x4)
+		decryptedText.WriteRune(rune(x4))
+	}
+	fmt.Print("Введите имя файла для сохранения x4: ")
+	var x4NameFile string
+	fmt.Scanln(&x4NameFile)
+	saveToFileInt(x4NameFile, x4Values)
+	fmt.Println("Итоговый результат x4 сохранен в файл:", x4NameFile)
+
+	fmt.Print("Введите имя файла для сохранения расшифрованного текста: ")
+	var decryptedFile string
+	fmt.Scanln(&decryptedFile)
+	err = os.WriteFile(decryptedFile, []byte(decryptedText.String()), 0644)
+	if err != nil {
+		fmt.Println("Ошибка создания файла с расшифрованным текстом!")
+		return
+	}
+	fmt.Println("Расшифрованный текст сохранен в файл:", decryptedFile)
 }
 
 func mitmAttack() {
@@ -212,4 +200,16 @@ func mitmAttack() {
 
 	fmt.Println("Боб получает подмененное сообщение:", finalDecrypted.String())
 	fmt.Println("✓ Атака MITM завершена успешно!")
+}
+func saveToFileInt(filename string, values []int) {
+	outfile, err := os.Create(filename)
+	if err != nil {
+		fmt.Println("Ошибка создания файла:", filename)
+		return
+	}
+	defer outfile.Close()
+
+	for _, v := range values {
+		_ = binary.Write(outfile, binary.LittleEndian, int32(v))
+	}
 }
