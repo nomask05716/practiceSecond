@@ -18,6 +18,7 @@ int main(){
         choiceMenu = ValidInputMainMenu();
         switch (choiceMenu) {
             case decompositionDegree: {
+                
                 int footing = exp(),degr = degree(),mod = modul();
                 bool ferma = threoremFerma(footing,degr,mod);
                 if (ferma == 1){
@@ -47,21 +48,7 @@ int main(){
                 break;
             }
             case chainSht:{
-                int a =exp(),b = exp();
-                vector<int> res= chainShotes(a,b);
-                cout << " [";
-                size_t sizeVec = res.size();
-                for (int i : res ){
-                    if (sizeVec>1){
-                        cout << i << ", ";
-                        sizeVec -=1;
-                    }else {
-                        cout <<i;
-                    }
-                    
-                }
-                cout << "]"<<endl;
-                diophantineEquation();
+                fractionAndEquation();
                 break;
             }
             case MitM:{

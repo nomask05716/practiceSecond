@@ -1,6 +1,5 @@
 #include <iostream>
 #include "validInput.h"
-#include <cassert>
 using namespace std;
 int ValidInputMainMenu()
 {

@@ -67,14 +67,14 @@ int extendedGcd(int a, int b, int &u, int &v) {
         return a;
     }
     int u1, v1;
-    //cout <<"extendedGcd(" << b << ", " << a % b << ")" << endl;
+    cout <<"extendedGcd(" << b << ", " << a % b << ")" << endl;
     int gcd = extendedGcd(b, a % b, u1, v1);
-    //cout <<"u1 = " << u1 << ", v1 = " << v1 << endl;
+    cout <<"u1 = " << u1 << ", v1 = " << v1 << endl;
     u = v1;
     v = u1 - (a / b) * v1;
-    //cout <<"Вычисляем новые коэффициенты:" << endl;
-    //cout <<"u = v1 = " << v1 << endl;
-    //cout <<"v = u1 - (a/b)*v1 = " << u1 << " -(" << a << "/" << b << ")* " << v1 << " = " << u1 << " - " << (a/b) << "*" << v1 << " = " << v << endl;;
+    cout <<"Вычисляем новые коэффициенты:" << endl;
+    cout <<"u = v1 = " << v1 << endl;
+    cout <<"v = u1 - (a/b)*v1 = " << u1 << " -(" << a << "/" << b << ")* " << v1 << " = " << u1 << " - " << (a/b) << "*" << v1 << " = " << v << endl;;
     return gcd;
 }
 int searchReciprocalNum(int c, int m) {
@@ -103,10 +103,50 @@ vector<int> chainShotes(int a, int b) {
     }
     return coefficients;
 }
-void diophantineEquation(){
-    int u, v;
-    int a = 275, b = 145,c =10;
-    if (c % gcd(a,b) == 0){
-        int gcd = extendedGcd(a,b,u,v);
-    }else   cout<<"Решения в целых числах не существует"<<endl;
+void continuedFractionValues(const vector<int>& cf, vector<int>& P, vector<int>& Q) {
+    P.push_back(1);
+    Q.push_back(0);
+    P.push_back(cf[0]);
+    Q.push_back(1);
+    for (size_t k = 1; k < cf.size(); k++) {
+        P.push_back(cf[k] * P[k] + P[k-1]);
+        Q.push_back(cf[k] * Q[k] + Q[k-1]);
+    }
 }
+void solveDiophantine(int a, int b, int c) {
+    cout << "Решаем диофантово уравнение: " << a << " * x + " << b << " * y = " << c << endl;
+    vector<int> cf = chainShotes(a, b);
+    cout << "Цепная дробь для " << a << "/" << b << ": [";
+    bool first = true;
+    for (const auto& q : cf) {
+        if (!first) cout << ", ";
+        cout << q;
+        first = false;
+    }
+    cout << "]" << endl;
+    vector<int> P, Q;
+    continuedFractionValues(cf, P, Q);
+    size_t n = cf.size();
+    int Qn_1 = Q[n-2];
+    int Pn_1 = P[n-2];
+    int x0, y0;
+    if (n % 2 == 0) {
+        x0 = c * Qn_1;
+        y0 = -c * Pn_1;
+    } else {
+        x0 = -c * Qn_1;
+        y0 = c * Pn_1;
+    }
+    cout << "Частное решение: x0 = " << x0 << ", y0 = " << y0 << endl
+         << "Общее решение: " << endl
+         << "x = " << x0 << " + " << b << " * t" << endl
+         << "y = " << y0 << " - " << a << " * t" << endl
+         << "где t ∈ ℤ" << endl;
+}
+
+void fractionAndEquation() {
+    int a =275, b = 145, c = 10;
+    solveDiophantine(a, b, c);
+}
+
+
